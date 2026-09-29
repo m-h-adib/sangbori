@@ -221,7 +221,7 @@ namespace SangbariInvoice.Data
                 cmd.CommandText = @"SELECT ItemID, InvoiceID, RowDate, StoneDescription,
                                             Quantity, IsTool, IsQtyPrice, IsReturn, Width, Length, UnitPrice
                                      FROM InvoiceItems WHERE InvoiceID = $id
-                                     ORDER BY RowDate ASC;";
+                                     ORDER BY RowDate ASC, ItemID ASC;";
                 cmd.Parameters.AddWithValue("$id", invoiceId);
 
                 using var reader = cmd.ExecuteReader();

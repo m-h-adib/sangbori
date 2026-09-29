@@ -347,7 +347,25 @@ namespace SangbariInvoice.Forms
         private void AddEmptyRow()
         {
             Save();
-            var item = new InvoiceItem { RowDate = PersianDateHelper.Today() };
+
+            string rowDate = PersianDateHelper.Today();
+
+            if (_grid.Rows.Count > 0)
+            {
+                var lastRow = _grid.Rows[_grid.Rows.Count - 1];
+
+                if (!lastRow.IsNewRow &&
+                    lastRow.Cells["RowDate"].Value != null)
+                {
+                    rowDate = lastRow.Cells["RowDate"].Value.ToString()!;
+                }
+            }
+
+            var item = new InvoiceItem
+            {
+                RowDate = rowDate
+            };
+
             AddRow(item);
         }
 
