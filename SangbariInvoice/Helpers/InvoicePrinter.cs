@@ -14,7 +14,6 @@ namespace SangbariInvoice.Helpers
         private int _nextItemIndex;
 
         private readonly Font _titleFont = AppFonts.GetFont(16, FontStyle.Bold);
-        private readonly Font _titleFont2 = AppFonts.GetFont(10, FontStyle.Bold);
         private readonly Font _headerFont = AppFonts.GetFont(10, FontStyle.Bold);
         private readonly Font _normalFont = AppFonts.GetFont(9.5f);
         private readonly Font _boldFont = AppFonts.GetFont(10, FontStyle.Bold);
@@ -29,7 +28,7 @@ namespace SangbariInvoice.Helpers
         // (they're internal entry-mode flags, not something a customer needs to see).
         private readonly (string Header, float Width)[] _columns =
         {
-            ("تاریخ", 90), ("شرح سنگ", 160), ("تعداد", 55),
+			("#", 35),("تاریخ", 90), ("شرح سنگ", 160), ("تعداد", 55),
             ("عرض", 60), ("طول", 60), ("مترمربع", 70), ("فی", 75), ("مجموع", 90)
         };
 
@@ -94,7 +93,7 @@ namespace SangbariInvoice.Helpers
         {
             var g = e.Graphics!;
             var bounds = e.MarginBounds;
-            float right = bounds.Right;
+            float right = 770;//bounds.Right;
             //float y = bounds.Top;
             float y = 50;
 
@@ -152,6 +151,7 @@ namespace SangbariInvoice.Helpers
                 var item = _invoice.Items[_nextItemIndex];
                 var cells = new[]
                 {
+                    _nextItemIndex+"",
                     item.RowDate,
                     //item.IsReturn ? "بله" : "خیر",
                     item.StoneDescription,

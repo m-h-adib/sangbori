@@ -26,19 +26,20 @@ namespace SangbariInvoice.Forms
         private readonly Label _lblReceivedTotal = new();
         private readonly Label _lblRemaining = new();
 
-        // Column order:
-        // تاریخ | مرجوعی | شرح سنگ | تعداد*فی | تعداد | ابزار | عرض | طول | مترمربع | فی | مجموع
-        private const int ColRowDate = 0;
-        private const int ColIsReturn = 1;
-        private const int ColDesc = 2;
-        private const int ColIsQtyPrice = 3;
-        private const int ColQuantity = 4;
-        private const int ColIsTool = 5;
-        private const int ColWidth = 6;
-        private const int ColLength = 7;
-        private const int ColSquareMeter = 8;
-        private const int ColUnitPrice = 9;
-        private const int ColLineTotal = 10;
+		// Column order:
+		// تاریخ | مرجوعی | شرح سنگ | تعداد*فی | تعداد | ابزار | عرض | طول | مترمربع | فی | مجموع
+		private const int ColNo = 0;
+		private const int ColRowDate = 1;
+        private const int ColIsReturn = 2;
+        private const int ColDesc = 3;
+        private const int ColIsQtyPrice = 4;
+        private const int ColQuantity = 5;
+        private const int ColIsTool = 6;
+        private const int ColWidth = 7;
+        private const int ColLength = 8;
+        private const int ColSquareMeter = 9;
+        private const int ColUnitPrice = 10;
+        private const int ColLineTotal = 11;
 
         public InvoiceForm(int? invoiceId)
         {
@@ -208,7 +209,15 @@ namespace SangbariInvoice.Forms
         {
             _grid.Columns.Clear();
 
-            _grid.Columns.Add(new DataGridViewTextBoxColumn
+			_grid.Columns.Add(new DataGridViewTextBoxColumn
+			{
+				HeaderText = "#",
+				Name = "No",
+				ReadOnly = true,
+				DefaultCellStyle = { BackColor = Color.WhiteSmoke }
+			});
+
+			_grid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 HeaderText = "تاریخ",
                 Name = "RowDate",
@@ -322,8 +331,13 @@ namespace SangbariInvoice.Forms
             _txtReferrer.Text = _invoice.ReferrerName;
             _dtInvoiceDate.DateText = _invoice.InvoiceDate;
 
-            foreach (var item in _invoice.Items)
-                AddRow(item);
+            for (int i = 0; i < _invoice.Items.Count; i++)
+            {
+
+                AddRow(_invoice.Items[i],i+1);
+			}
+            //foreach (var item in _invoice.Items)
+            //    AddRow(item);
 
             FormatNumericCells();
         }
@@ -366,14 +380,15 @@ namespace SangbariInvoice.Forms
                 RowDate = rowDate
             };
 
-            AddRow(item);
+            AddRow(item,_grid.Rows.Count+1);
         }
 
-        private void AddRow(InvoiceItem item)
+        private void AddRow(InvoiceItem item,int cc)
         {
             int rowIndex = _grid.Rows.Add();
             var row = _grid.Rows[rowIndex];
 
+            row.Cells[ColNo].Value= cc+"";
             row.Cells[ColRowDate].Value = item.RowDate;
             row.Cells[ColIsReturn].Value = item.IsReturn;
             row.Cells[ColDesc].Value = item.StoneDescription;
@@ -411,10 +426,13 @@ namespace SangbariInvoice.Forms
         }
         private void DeleteSelectedRow()
         {
-            if (_grid.CurrentRow != null && !_grid.CurrentRow.IsNewRow)
+            if (MessageBox.Show("از حذف رکورد مورد نظر مطمئنید؟","",MessageBoxButtons.YesNo,MessageBoxIcon.Warning,MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
-                _grid.Rows.Remove(_grid.CurrentRow);
-                RecalculateTotals();
+                if (_grid.CurrentRow != null && !_grid.CurrentRow.IsNewRow)
+                {
+                    _grid.Rows.Remove(_grid.CurrentRow);
+                    RecalculateTotals();
+                }
             }
         }
 
