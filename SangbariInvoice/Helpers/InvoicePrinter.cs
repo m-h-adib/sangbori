@@ -93,7 +93,7 @@ namespace SangbariInvoice.Helpers
         {
             var g = e.Graphics!;
             var bounds = e.MarginBounds;
-            float right = 770;//bounds.Right;
+            float right = bounds.Right+20;
             //float y = bounds.Top;
             float y = 50;
 
@@ -151,7 +151,7 @@ namespace SangbariInvoice.Helpers
                 var item = _invoice.Items[_nextItemIndex];
                 var cells = new[]
                 {
-                    _nextItemIndex+"",
+                    (_nextItemIndex+1)+"",
                     item.RowDate,
                     //item.IsReturn ? "بله" : "خیر",
                     item.StoneDescription,
