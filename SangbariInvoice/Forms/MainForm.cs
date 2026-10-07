@@ -197,7 +197,7 @@ namespace SangbariInvoice.Forms
 
         public async Task<int> SendSmsMeliPayamak1(string mobile, decimal price,string date)
         {
-            var base_url = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
+            var base_url = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
             var username = "9133216308";
             var password = "63bd0a4a-fa0e-442b-87e5-1258c5857180";
             var to = mobile;
@@ -212,7 +212,8 @@ namespace SangbariInvoice.Forms
                 password = password,
                 bodyId = bodyId,
                 to = to,
-                text = price+";"+date
+                from = "50004001216307",
+                text = "با سلام"+Environment.NewLine+" مبلغ " + price + " تومان بدهی شما به سنگ المهدی تا تاریخ "+ date
             };
 
             var response = await client.PostAsJsonAsync(url, json);
