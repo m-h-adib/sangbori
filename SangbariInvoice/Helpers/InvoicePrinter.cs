@@ -93,7 +93,7 @@ namespace SangbariInvoice.Helpers
         {
             var g = e.Graphics!;
             var bounds = e.MarginBounds;
-            float right = bounds.Right+20;
+            float right = bounds.Right+15;
             //float y = bounds.Top;
             float y = 50;
 

@@ -1,3 +1,5 @@
+using System.Net.Http.Json;
+using System.Text.Json;
 using SangbariInvoice.Data;
 using SangbariInvoice.Helpers;
 
@@ -190,6 +192,67 @@ namespace SangbariInvoice.Forms
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+
+        public async Task<int> SendSmsMeliPayamak1(string mobile, decimal price,string date)
+        {
+            var base_url = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
+            var username = "9133216308";
+            var password = "63bd0a4a-fa0e-442b-87e5-1258c5857180";
+            var to = mobile;
+            var bodyId = "553097";
+
+            var url = base_url;
+
+            var client = new HttpClient();
+            var json = new
+            {
+                username = username,
+                password = password,
+                bodyId = bodyId,
+                to = to,
+                text = price+";"+date
+            };
+
+            var response = await client.PostAsJsonAsync(url, json);
+
+            var result = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<object>(result);
+            var element = (JsonElement)data;
+            var status = element.GetProperty("RetStatus").GetInt32();
+
+            return status;
+        }
+
+        public async Task<int> SendSmsMeliPayamak2(string mobile, string card,string sheba,string name)
+        {
+            var base_url = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
+            var username = "9133216308";
+            var password = "63bd0a4a-fa0e-442b-87e5-1258c5857180";
+            var to = mobile;
+            var bodyId = "553096";
+
+            var url = base_url;
+
+            var client = new HttpClient();
+            var json = new
+            {
+                username = username,
+                password = password,
+                bodyId = bodyId,
+                to = to,
+                text = card+";"+sheba+";"+name
+            };
+
+            var response = await client.PostAsJsonAsync(url, json);
+
+            var result = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<object>(result);
+            var element = (JsonElement)data;
+            var status = element.GetProperty("RetStatus").GetInt32();
+
+            return status;
         }
     }
 }
