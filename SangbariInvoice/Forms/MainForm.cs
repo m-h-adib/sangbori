@@ -285,16 +285,12 @@ namespace SangbariInvoice.Forms
         }
 
 
-        private static string GetSmsCredential(string key) =>
-            Environment.GetEnvironmentVariable(key) is { Length: > 0 } value
-                ? value
-                : throw new InvalidOperationException($"متغیر محیطی {key} تنظیم نشده است.");
-
         public async Task<int> SendSmsMeliPayamak1(string mobile, decimal price,string date)
         {
             var base_url = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
-            var username = GetSmsCredential("MELIPAYAMAK_USERNAME");
-            var password = GetSmsCredential("MELIPAYAMAK_PASSWORD");
+            var settings = SmsAppSettings.Load();
+            var username = settings.Username;
+            var password = settings.Password;
             var to = mobile;
             var bodyId = "553097";
 
@@ -324,8 +320,9 @@ namespace SangbariInvoice.Forms
         public async Task<int> SendSmsMeliPayamak2(string mobile, string card,string sheba,string name)
         {
             var base_url = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
-            var username = GetSmsCredential("MELIPAYAMAK_USERNAME");
-            var password = GetSmsCredential("MELIPAYAMAK_PASSWORD");
+            var settings = SmsAppSettings.Load();
+            var username = settings.Username;
+            var password = settings.Password;
             var to = mobile;
             var bodyId = "553096";
 
