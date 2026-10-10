@@ -93,7 +93,15 @@ namespace SangbariInvoice.Forms
             _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             _grid.MultiSelect = false;
             _grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            _grid.CellDoubleClick += (_, _) => OpenSelectedInvoice();
+            _grid.CellDoubleClick += (_, e) =>
+            {
+                if (e.RowIndex >= 0 &&
+                    _grid.Columns[e.ColumnIndex].Name != "Sms1Button" &&
+                    _grid.Columns[e.ColumnIndex].Name != "Sms2Button")
+                {
+                    OpenSelectedInvoice();
+                }
+            };
             _grid.CellContentClick += Grid_CellContentClick;
 
             Controls.Add(_grid);
@@ -106,6 +114,7 @@ namespace SangbariInvoice.Forms
 
             _grid.DataSource = invoices.Select(inv => new
             {
+                InvoiceId = inv.InvoiceID,
                 شماره_فاکتور = inv.InvoiceID,
                 نام_مشتری = inv.CustomerName,
                 موبایل = inv.Mobile,
@@ -119,7 +128,7 @@ namespace SangbariInvoice.Forms
                 SmsName = inv.CustomerName,
             }).ToList();
 
-            foreach (var name in new[] { "SmsMobile", "SmsBalance", "SmsDate", "SmsName" })
+            foreach (var name in new[] { "InvoiceId", "SmsMobile", "SmsBalance", "SmsDate", "SmsName" })
             {
                 if (_grid.Columns.Contains(name))
                     _grid.Columns[name].Visible = false;
@@ -207,8 +216,14 @@ namespace SangbariInvoice.Forms
 
         private int? GetSelectedInvoiceId()
         {
-            if (_grid.CurrentRow == null) return null;
-            return Convert.ToInt32(_grid.CurrentRow.Cells[0].Value);
+            if (_grid.CurrentRow == null)
+                return null;
+
+            var value = _grid.CurrentRow.Cells["InvoiceId"]?.Value;
+            if (value == null || !int.TryParse(Convert.ToString(value), out var invoiceId))
+                return null;
+
+            return invoiceId;
         }
 
         private void OpenSelectedInvoice()
