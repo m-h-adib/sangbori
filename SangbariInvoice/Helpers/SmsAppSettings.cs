@@ -8,6 +8,7 @@ namespace SangbariInvoice.Helpers
         public string Password { get; init; } = "";
         public string CardNumber { get; init; } = "";
         public string ShebaNumber { get; init; } = "";
+        public string Sms2 { get; init; } = "";
 
         public static SmsAppSettings Load()
         {
@@ -27,7 +28,8 @@ namespace SangbariInvoice.Helpers
                 Username = ReadString(sms, "Username"),
                 Password = ReadString(sms, "Password"),
                 CardNumber = ReadString(sms, "CardNumber"),
-                ShebaNumber = ReadString(sms, "ShebaNumber")
+                ShebaNumber = ReadString(sms, "ShebaNumber"),
+                Sms2 = ReadString(sms, "Sms2")
             };
 
             if (string.IsNullOrWhiteSpace(settings.Username) ||

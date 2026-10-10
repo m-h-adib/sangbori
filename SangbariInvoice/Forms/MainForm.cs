@@ -301,7 +301,6 @@ namespace SangbariInvoice.Forms
             {
                 username = username,
                 password = password,
-                bodyId = bodyId,
                 to = to,
                 from = "50004001216307",
                 text = "با سلام"+Environment.NewLine+" مبلغ " + price + " تومان بدهی شما به سنگ المهدی تا تاریخ "+ date
@@ -319,10 +318,11 @@ namespace SangbariInvoice.Forms
 
         public async Task<int> SendSmsMeliPayamak2(string mobile, string card,string sheba,string name)
         {
-            var base_url = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
+            var base_url = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
             var settings = SmsAppSettings.Load();
             var username = settings.Username;
             var password = settings.Password;
+            var sms2 = settings.Sms2;
             var to = mobile;
             var bodyId = "553097";
 
@@ -333,10 +333,9 @@ namespace SangbariInvoice.Forms
             {
                 username = username,
                 password = password,
-                bodyId = bodyId,
                 to = to,
                 from = "50004001216307",
-                text = "شماره کارت "+card+" شماره شبا "+sheba+" بنام "+name+" لطفاً پس از واریز به شماره 09136016314 اطلاع دهید.با تشکر سنگ المهدی"
+                text = sms2
             };
 
             var response = await client.PostAsJsonAsync(url, json);
