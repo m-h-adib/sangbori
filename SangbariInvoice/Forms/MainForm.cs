@@ -94,6 +94,7 @@ namespace SangbariInvoice.Forms
             _grid.MultiSelect = false;
             _grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             _grid.CellDoubleClick += (_, _) => OpenSelectedInvoice();
+            _grid.CellContentClick += Grid_CellContentClick;
 
             Controls.Add(_grid);
             Controls.Add(topPanel);
@@ -112,7 +113,96 @@ namespace SangbariInvoice.Forms
                 جمع_کل = inv.TotalAmount.ToString("N0"),
                 دریافتی = inv.ReceivedAmount.ToString("N0"),
                 مانده = inv.RemainingBalance.ToString("N0"),
+                SmsMobile = inv.Mobile,
+                SmsBalance = inv.RemainingBalance,
+                SmsDate = inv.InvoiceDate,
+                SmsName = inv.CustomerName,
             }).ToList();
+
+            foreach (var name in new[] { "SmsMobile", "SmsBalance", "SmsDate", "SmsName" })
+            {
+                if (_grid.Columns.Contains(name))
+                    _grid.Columns[name].Visible = false;
+            }
+
+            AddSmsButtonColumn("Sms1Button", "پیامک ۱");
+            AddSmsButtonColumn("Sms2Button", "پیامک ۲");
+        }
+
+        private void AddSmsButtonColumn(string name, string header)
+        {
+            if (_grid.Columns.Contains(name))
+                return;
+
+            _grid.Columns.Add(new DataGridViewButtonColumn
+            {
+                Name = name,
+                HeaderText = header,
+                Text = header,
+                UseColumnTextForButtonValue = true,
+                Width = 95,
+                MinimumWidth = 85,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+            });
+        }
+
+        private async void Grid_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+
+            var row = _grid.Rows[e.RowIndex];
+            var columnName = _grid.Columns[e.ColumnIndex].Name;
+            if (columnName != "Sms1Button" && columnName != "Sms2Button")
+                return;
+
+            var mobile = Convert.ToString(row.Cells["SmsMobile"].Value)?.Trim();
+            if (string.IsNullOrWhiteSpace(mobile))
+            {
+                MessageBox.Show("شماره موبایل مشتری ثبت نشده است.", "خطا",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var customerName = Convert.ToString(row.Cells["SmsName"].Value) ?? "";
+            var prompt = columnName == "Sms1Button"
+                ? $"پیامک بدهی برای {customerName} به شماره {mobile} ارسال شود؟"
+                : $"پیامک اطلاعات کارت و شبا برای {customerName} به شماره {mobile} ارسال شود؟";
+
+            if (MessageBox.Show(prompt, "تأیید ارسال", MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                int status;
+                if (columnName == "Sms1Button")
+                {
+                    var balance = Convert.ToDecimal(row.Cells["SmsBalance"].Value);
+                    var date = Convert.ToString(row.Cells["SmsDate"].Value) ?? "";
+                    status = await SendSmsMeliPayamak1(mobile, balance, date);
+                }
+                else
+                {
+                    var settings = SmsAppSettings.Load();
+                    status = await SendSmsMeliPayamak2(
+                        mobile, settings.CardNumber, settings.ShebaNumber, customerName);
+                }
+
+                MessageBox.Show($"پاسخ سرویس پیامک: {status}", "نتیجه ارسال",
+                    MessageBoxButtons.OK,
+                    status == 1 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"ارسال پیامک ناموفق بود: {ex.Message}", "خطا",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
         }
 
         private int? GetSelectedInvoiceId()
@@ -195,17 +285,22 @@ namespace SangbariInvoice.Forms
         }
 
 
+        private static string GetSmsCredential(string key) =>
+            Environment.GetEnvironmentVariable(key) is { Length: > 0 } value
+                ? value
+                : throw new InvalidOperationException($"متغیر محیطی {key} تنظیم نشده است.");
+
         public async Task<int> SendSmsMeliPayamak1(string mobile, decimal price,string date)
         {
             var base_url = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
-            var username = "9133216308";
-            var password = "63bd0a4a-fa0e-442b-87e5-1258c5857180";
+            var username = GetSmsCredential("MELIPAYAMAK_USERNAME");
+            var password = GetSmsCredential("MELIPAYAMAK_PASSWORD");
             var to = mobile;
             var bodyId = "553097";
 
             var url = base_url;
 
-            var client = new HttpClient();
+            using var client = new HttpClient();
             var json = new
             {
                 username = username,
@@ -228,15 +323,15 @@ namespace SangbariInvoice.Forms
 
         public async Task<int> SendSmsMeliPayamak2(string mobile, string card,string sheba,string name)
         {
-            var base_url = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
-            var username = "9133216308";
-            var password = "63bd0a4a-fa0e-442b-87e5-1258c5857180";
+            var base_url = "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber";
+            var username = GetSmsCredential("MELIPAYAMAK_USERNAME");
+            var password = GetSmsCredential("MELIPAYAMAK_PASSWORD");
             var to = mobile;
             var bodyId = "553097";
 
             var url = base_url;
 
-            var client = new HttpClient();
+            using var client = new HttpClient();
             var json = new
             {
                 username = username,
