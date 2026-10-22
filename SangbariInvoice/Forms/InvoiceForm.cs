@@ -721,12 +721,12 @@ namespace SangbariInvoice.Forms
               
                 bool isTool = row.Cells[ColIsTool].Value is true;
                 bool isQtyPrice = row.Cells[ColIsQtyPrice].Value is true;
-                //bool isReturn = row.Cells[ColIsReturn].Value is true;
+                bool isReturn = row.Cells[ColIsReturn].Value is true;
 
                 var item = new InvoiceItem
                 {
                     RowDate = row.Cells[ColRowDate].Value?.ToString() ?? "",
-                    //IsReturn = isReturn,
+                    IsReturn = isReturn,
                     StoneDescription = row.Cells[ColDesc].Value?.ToString() ?? "",
                     IsQtyPrice = isQtyPrice,
                     Quantity = ParseDecimal(row.Cells[ColQuantity].Value),
