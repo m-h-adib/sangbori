@@ -1,5 +1,3 @@
-using System.Net.Http.Json;
-using System.Text.Json;
 using SangbariInvoice.Data;
 using SangbariInvoice.Helpers;
 
@@ -87,7 +85,7 @@ namespace SangbariInvoice.Forms
 
             _grid.Dock = DockStyle.Fill;
             _grid.ReadOnly = true;
-            _grid.ColumnHeadersHeight = 35;  // ارتفاع تیتر ستون‌ها
+            _grid.ColumnHeadersHeight = 35;
             _grid.AllowUserToAddRows = false;
             _grid.AllowUserToDeleteRows = false;
             _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -95,7 +93,7 @@ namespace SangbariInvoice.Forms
             _grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             _grid.CellDoubleClick += (_, e) =>
             {
-                if (e.RowIndex >= 0 &&
+                if (e.RowIndex >= 0 && e.ColumnIndex >= 0 &&
                     _grid.Columns[e.ColumnIndex].Name != "Sms1Button" &&
                     _grid.Columns[e.ColumnIndex].Name != "Sms2Button")
                 {
@@ -134,8 +132,8 @@ namespace SangbariInvoice.Forms
                     _grid.Columns[name].Visible = false;
             }
 
-           // AddSmsButtonColumn("Sms1Button", "پیامک ۱");
-           // AddSmsButtonColumn("Sms2Button", "پیامک ۲");
+            AddSmsButtonColumn("Sms1Button", "پیامک بدهی");
+            AddSmsButtonColumn("Sms2Button", "پیامک کارت و شبا");
         }
 
         private void AddSmsButtonColumn(string name, string header)
@@ -149,8 +147,8 @@ namespace SangbariInvoice.Forms
                 HeaderText = header,
                 Text = header,
                 UseColumnTextForButtonValue = true,
-                Width = 95,
-                MinimumWidth = 85,
+                Width = 115,
+                MinimumWidth = 105,
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.None
             });
         }
@@ -185,23 +183,30 @@ namespace SangbariInvoice.Forms
             try
             {
                 Cursor = Cursors.WaitCursor;
-                int status;
+                var settings = SmsAppSettings.Load();
+                string message;
+
                 if (columnName == "Sms1Button")
                 {
                     var balance = Convert.ToDecimal(row.Cells["SmsBalance"].Value);
                     var date = Convert.ToString(row.Cells["SmsDate"].Value) ?? "";
-                    status = await SendSmsMeliPayamak1(mobile, balance, date);
+                    message = "با سلام" + Environment.NewLine +
+                              "مبلغ " + balance.ToString("N0") +
+                              " تومان بدهی شما به سنگ المهدی تا تاریخ " + date;
                 }
                 else
                 {
-                    var settings = SmsAppSettings.Load();
-                    status = await SendSmsMeliPayamak2(
-                        mobile, settings.CardNumber, settings.ShebaNumber, customerName);
+                    message = settings.BuildCardAndShebaMessage(customerName);
                 }
 
-                MessageBox.Show($"پاسخ سرویس پیامک: {status}", "نتیجه ارسال",
-                    MessageBoxButtons.OK,
-                    status == 1 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await UsbModemSmsService.SendAsync(
+                    settings.ModemPort,
+                    settings.ModemBaudRate,
+                    mobile,
+                    message);
+
+                MessageBox.Show("پیامک با موفقیت به مودم تحویل داده شد و پذیرش آن توسط شبکه تأیید شد.",
+                    "نتیجه ارسال", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -242,9 +247,7 @@ namespace SangbariInvoice.Forms
         {
             using var form = new InvoiceForm(invoiceId);
             if (form.ShowDialog(this) == DialogResult.OK)
-            {
                 LoadGrid(_txtSearch.Text);
-            }
         }
 
         private void DeleteSelectedInvoice()
@@ -299,68 +302,12 @@ namespace SangbariInvoice.Forms
             }
         }
 
-
-        public async Task<int> SendSmsMeliPayamak1(string mobile, decimal price,string date)
-        {
-            var base_url = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
-            var settings = SmsAppSettings.Load();
-            var username = settings.Username;
-            var password = settings.Password;
-            var to = mobile;
-            var bodyId = "553097";
-
-            var url = base_url;
-
-            using var client = new HttpClient();
-            var json = new
-            {
-                username = username,
-                password = password,
-                to = to,
-                from = "50004001216307",
-                text = "با سلام"+Environment.NewLine+" مبلغ " + price + " تومان بدهی شما به سنگ المهدی تا تاریخ "+ date
-            };
-
-            var response = await client.PostAsJsonAsync(url, json);
-
-            var result = await response.Content.ReadAsStringAsync();
-            var data = JsonSerializer.Deserialize<object>(result);
-            var element = (JsonElement)data;
-            var status = element.GetProperty("RetStatus").GetInt32();
-
-            return status;
-        }
-
-        public async Task<int> SendSmsMeliPayamak2(string mobile, string card,string sheba,string name)
-        {
-            var base_url = "https://rest.payamak-panel.com/api/SendSMS/SendSMS";
-            var settings = SmsAppSettings.Load();
-            var username = settings.Username;
-            var password = settings.Password;
-            var sms2 = settings.Sms2;
-            var to = mobile;
-            var bodyId = "553097";
-
-            var url = base_url;
-
-            using var client = new HttpClient();
-            var json = new
-            {
-                username = username,
-                password = password,
-                to = to,
-                from = "50004001216307",
-                text = sms2
-            };
-
-            var response = await client.PostAsJsonAsync(url, json);
-
-            var result = await response.Content.ReadAsStringAsync();
-            var data = JsonSerializer.Deserialize<object>(result);
-            var element = (JsonElement)data;
-            var status = element.GetProperty("RetStatus").GetInt32();
-
-            return status;
-        }
+        /*
+         * روش‌های قبلی ارسال پیامک از طریق سامانه ملی‌پیامک عمداً غیرفعال شده‌اند.
+         * ارسال جدید از طریق UsbModemSmsService و پورت سریال مودم انجام می‌شود.
+         *
+         * public async Task<int> SendSmsMeliPayamak1(...) { ... }
+         * public async Task<int> SendSmsMeliPayamak2(...) { ... }
+         */
     }
 }
