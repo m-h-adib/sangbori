@@ -11,6 +11,8 @@ namespace SangbariInvoice.Helpers
         /// </summary>
         public static void ExportInvoiceList(List<Invoice> invoices, string filePath)
         {
+            InvoiceSummaryHelper.Populate(invoices);
+
             using var workbook = new XLWorkbook();
             var ws = workbook.Worksheets.Add("فاکتورها");
             ws.RightToLeft = true;
@@ -18,7 +20,7 @@ namespace SangbariInvoice.Helpers
             string[] headers =
             {
                 "شماره فاکتور", "نام مشتری", "موبایل", "تاریخ فاکتور",
-                "جمع کل", "دریافتی", "مانده حساب"
+                "ابزار", "متر مربع", "جمع کل", "دریافتی", "مانده حساب"
             };
 
             for (int i = 0; i < headers.Length; i++)
@@ -36,13 +38,17 @@ namespace SangbariInvoice.Helpers
                 ws.Cell(row, 2).Value = inv.CustomerName;
                 ws.Cell(row, 3).Value = inv.Mobile;
                 ws.Cell(row, 4).Value = inv.InvoiceDate;
-                ws.Cell(row, 5).Value = (double)inv.TotalAmount;
-                ws.Cell(row, 6).Value = (double)inv.ReceivedAmount;
-                ws.Cell(row, 7).Value = (double)inv.RemainingBalance;
+                ws.Cell(row, 5).Value = (double)inv.ToolAmount;
+                ws.Cell(row, 6).Value = (double)inv.SquareMeter;
+                ws.Cell(row, 7).Value = (double)inv.TotalAmount;
+                ws.Cell(row, 8).Value = (double)inv.ReceivedAmount;
+                ws.Cell(row, 9).Value = (double)inv.RemainingBalance;
                 row++;
             }
 
-            ws.Range(2, 5, row - 1, 7).Style.NumberFormat.Format = "#,##0";
+            ws.Range(2, 5, row - 1, 5).Style.NumberFormat.Format = "#,##0";
+            ws.Range(2, 6, row - 1, 6).Style.NumberFormat.Format = "#,##0.###";
+            ws.Range(2, 7, row - 1, 9).Style.NumberFormat.Format = "#,##0";
             ws.Columns().AdjustToContents();
 
             workbook.SaveAs(filePath);
