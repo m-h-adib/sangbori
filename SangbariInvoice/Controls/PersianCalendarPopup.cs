@@ -86,7 +86,7 @@ namespace SangbariInvoice.Controls
         private void PopulateHeaderCombos()
         {
             var currentYear = PersianDateHelper.TodayParts().Year;
-            for (int y = currentYear - 10; y <= currentYear + 5; y++)
+            for (int y = currentYear - 5; y <= currentYear + 20; y++)
                 _cboYear.Items.Add(y.ToString());
             _cboYear.SelectedItem = _year.ToString();
 
