@@ -7,7 +7,7 @@ namespace SangbariInvoice.Helpers
         public string CardNumber { get; init; } = "";
         public string ShebaNumber { get; init; } = "";
         public string Sms2 { get; init; } = "";
-        public string ModemAddress { get; init; } = "http://192.168.1.1";
+        public string ModemAddress { get; init; } = "http://192.168.8.1";
 
         public static SmsAppSettings Load()
         {
@@ -27,7 +27,7 @@ namespace SangbariInvoice.Helpers
                 CardNumber = ReadString(sms, "CardNumber"),
                 ShebaNumber = ReadString(sms, "ShebaNumber"),
                 Sms2 = ReadString(sms, "Sms2"),
-                ModemAddress = ReadString(sms, "ModemAddress", "http://192.168.1.1")
+                ModemAddress = ReadString(sms, "ModemAddress", "http://192.168.8.1")
             };
         }
 
