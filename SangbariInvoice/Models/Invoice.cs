@@ -20,6 +20,12 @@ namespace SangbariInvoice.Models
         /// <summary>Sum of LineTotal across all items (return rows already negative). Calculated, not user-entered.</summary>
         public decimal TotalAmount { get; set; }
 
+        /// <summary>Sum of line totals for rows marked as Tool.</summary>
+        public decimal ToolAmount { get; set; }
+
+        /// <summary>Net square meters, with return rows subtracted.</summary>
+        public decimal SquareMeter { get; set; }
+
         /// <summary>
         /// List of received-payment entries ("وجوه دریافتی"). The user can add as many
         /// as needed via the payments dialog; stored as JSON in a single column.
