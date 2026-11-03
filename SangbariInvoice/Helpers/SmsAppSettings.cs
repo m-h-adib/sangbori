@@ -36,7 +36,7 @@ namespace SangbariInvoice.Helpers
             var message = Sms2;
 
             if (string.IsNullOrWhiteSpace(message))
-                message = "با سلام {name}\\nشماره کارت: {card}\\nشماره شبا: {sheba}";
+                message = "با سلام {name}\nشماره کارت: {card}\nشماره شبا: {sheba}";
 
             return message
                 .Replace("{name}", customerName ?? "", StringComparison.OrdinalIgnoreCase)
