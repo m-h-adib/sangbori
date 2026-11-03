@@ -7,8 +7,7 @@ namespace SangbariInvoice.Helpers
         public string CardNumber { get; init; } = "";
         public string ShebaNumber { get; init; } = "";
         public string Sms2 { get; init; } = "";
-        public string ModemPort { get; init; } = "COM4";
-        public int ModemBaudRate { get; init; } = 115200;
+        public string ModemAddress { get; init; } = "http://192.168.1.1";
 
         public static SmsAppSettings Load()
         {
@@ -23,22 +22,13 @@ namespace SangbariInvoice.Helpers
             static string ReadString(JsonElement section, string name, string fallback = "") =>
                 section.TryGetProperty(name, out var value) ? value.GetString() ?? fallback : fallback;
 
-            var settings = new SmsAppSettings
+            return new SmsAppSettings
             {
                 CardNumber = ReadString(sms, "CardNumber"),
                 ShebaNumber = ReadString(sms, "ShebaNumber"),
                 Sms2 = ReadString(sms, "Sms2"),
-                ModemPort = ReadString(sms, "ModemPort", "COM4"),
-                ModemBaudRate = sms.TryGetProperty("ModemBaudRate", out var baudRate) &&
-                                baudRate.TryGetInt32(out var parsedBaudRate)
-                    ? parsedBaudRate
-                    : 115200
+                ModemAddress = ReadString(sms, "ModemAddress", "http://192.168.1.1")
             };
-
-            if (settings.ModemBaudRate <= 0)
-                throw new InvalidDataException("ModemBaudRate باید بزرگ‌تر از صفر باشد.");
-
-            return settings;
         }
 
         public string BuildCardAndShebaMessage(string customerName)
