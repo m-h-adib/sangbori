@@ -199,9 +199,8 @@ namespace SangbariInvoice.Forms
                     message = settings.BuildCardAndShebaMessage(customerName);
                 }
 
-                await UsbModemSmsService.SendAsync(
-                    settings.ModemPort,
-                    settings.ModemBaudRate,
+                await HuaweiHiLinkSmsService.SendAsync(
+                    settings.ModemAddress,
                     mobile,
                     message);
 
@@ -304,7 +303,7 @@ namespace SangbariInvoice.Forms
 
         /*
          * روش‌های قبلی ارسال پیامک از طریق سامانه ملی‌پیامک عمداً غیرفعال شده‌اند.
-         * ارسال جدید از طریق UsbModemSmsService و پورت سریال مودم انجام می‌شود.
+         * ارسال جدید از طریق HuaweiHiLinkSmsService و API داخلی مودم انجام می‌شود.
          *
          * public async Task<int> SendSmsMeliPayamak1(...) { ... }
          * public async Task<int> SendSmsMeliPayamak2(...) { ... }
