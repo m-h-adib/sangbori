@@ -134,8 +134,8 @@ namespace SangbariInvoice.Forms
                     _grid.Columns[name].Visible = false;
             }
 
-           // AddSmsButtonColumn("Sms1Button", "پیامک ۱");
-           // AddSmsButtonColumn("Sms2Button", "پیامک ۲");
+            AddSmsButtonColumn("Sms1Button", "پیامک ۱");
+            AddSmsButtonColumn("Sms2Button", "پیامک ۲");
         }
 
         private void AddSmsButtonColumn(string name, string header)
