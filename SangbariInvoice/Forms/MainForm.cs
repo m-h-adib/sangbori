@@ -109,6 +109,7 @@ namespace SangbariInvoice.Forms
         private void LoadGrid(string? search = null)
         {
             var invoices = DatabaseHelper.GetInvoices(search);
+            InvoiceSummaryHelper.Populate(invoices);
 
             _grid.DataSource = invoices.Select(inv => new
             {
@@ -117,6 +118,8 @@ namespace SangbariInvoice.Forms
                 نام_مشتری = inv.CustomerName,
                 موبایل = inv.Mobile,
                 تاریخ = inv.InvoiceDate,
+                ابزار = inv.ToolAmount.ToString("N0"),
+                متر_مربع = inv.SquareMeter.ToString("0.###"),
                 جمع_کل = inv.TotalAmount.ToString("N0"),
                 دریافتی = inv.ReceivedAmount.ToString("N0"),
                 مانده = inv.RemainingBalance.ToString("N0"),
