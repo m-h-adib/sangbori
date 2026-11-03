@@ -1,4 +1,5 @@
 using SangbariInvoice.Data;
+using SangbariInvoice.Models;
 
 namespace SangbariInvoice.Helpers
 {
@@ -8,7 +9,7 @@ namespace SangbariInvoice.Helpers
         /// Loads the total amount of tool rows and net square meters for all invoices
         /// in one query, avoiding one database query per invoice.
         /// </summary>
-        public static void Populate(IReadOnlyCollection<Models.Invoice> invoices)
+        public static void Populate(IReadOnlyCollection<Invoice> invoices)
         {
             if (invoices.Count == 0)
                 return;
