@@ -26,7 +26,7 @@ namespace SangbariInvoice.Forms
             RightToLeft = RightToLeft.Yes;
             RightToLeftLayout = true;
             Font = AppFonts.GetFont(9.5f);
-            Width = 1000;
+            Width = 1100;
             Height = 620;
             StartPosition = FormStartPosition.CenterScreen;
 
@@ -114,7 +114,7 @@ namespace SangbariInvoice.Forms
             _grid.DataSource = invoices.Select(inv => new
             {
                 InvoiceId = inv.InvoiceID,
-                شماره_فاکتور = inv.InvoiceID,
+                شماره= inv.InvoiceID,
                 نام_مشتری = inv.CustomerName,
                 موبایل = inv.Mobile,
                 تاریخ = inv.InvoiceDate,
@@ -135,8 +135,8 @@ namespace SangbariInvoice.Forms
                     _grid.Columns[name].Visible = false;
             }
 
-            AddSmsButtonColumn("Sms1Button", "پیامک بدهی");
-            AddSmsButtonColumn("Sms2Button", "پیامک کارت و شبا");
+            AddSmsButtonColumn("Sms1Button", "پیامک1");
+            AddSmsButtonColumn("Sms2Button", "پیامک2");
         }
 
         private void AddSmsButtonColumn(string name, string header)
