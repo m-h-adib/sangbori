@@ -125,7 +125,7 @@ namespace SangbariInvoice.Forms
                 مانده = inv.RemainingBalance.ToString("N0"),
                 SmsMobile = inv.Mobile,
                 SmsBalance = inv.RemainingBalance,
-                SmsDate = inv.InvoiceDate,
+                SmsDate = inv.LatestItemDate,
                 SmsName = inv.CustomerName,
             }).ToList();
 
