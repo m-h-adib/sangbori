@@ -17,6 +17,9 @@ namespace SangbariInvoice.Models
         /// <summary>Persian (Shamsi) date string, format yyyy/MM/dd</summary>
         public string InvoiceDate { get; set; } = string.Empty;
 
+        /// <summary>Latest item date, used for SMS balance date on the main grid.</summary>
+        public string LatestItemDate { get; set; } = string.Empty;
+
         /// <summary>Sum of LineTotal across all items (return rows already negative). Calculated, not user-entered.</summary>
         public decimal TotalAmount { get; set; }
 
