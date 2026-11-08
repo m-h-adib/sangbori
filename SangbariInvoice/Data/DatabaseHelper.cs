@@ -143,7 +143,9 @@ namespace SangbariInvoice.Data
             if (string.IsNullOrWhiteSpace(searchText))
             {
                 cmd.CommandText = @"SELECT InvoiceID, CustomerName, Mobile, InvoiceDate,
-                                            TotalAmount, ReceivedAmount, RemainingBalance
+                                            TotalAmount, ReceivedAmount, RemainingBalance,
+                                            (SELECT MAX(NULLIF(RowDate, '')) FROM InvoiceItems
+                                             WHERE InvoiceItems.InvoiceID = Invoices.InvoiceID) AS LatestItemDate
                                      FROM Invoices
                                      ORDER BY InvoiceID DESC;";
             }
@@ -169,6 +171,7 @@ namespace SangbariInvoice.Data
                     Mobile = reader.IsDBNull(2) ? "" : reader.GetString(2),
                     InvoiceDate = reader.GetString(3),
                     TotalAmount = totalAmount,
+                    LatestItemDate = reader.IsDBNull(7) ? "" : reader.GetString(7),
                     Payments = receivedAmount == 0
                         ? new List<PaymentEntry>()
                         : new List<PaymentEntry> { new PaymentEntry { Amount = receivedAmount } },
