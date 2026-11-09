@@ -152,7 +152,9 @@ namespace SangbariInvoice.Data
             else
             {
                 cmd.CommandText = @"SELECT InvoiceID, CustomerName, Mobile, InvoiceDate,
-                                            TotalAmount, ReceivedAmount, RemainingBalance
+                                            TotalAmount, ReceivedAmount, RemainingBalance,
+                                            (SELECT MAX(NULLIF(RowDate, '')) FROM InvoiceItems
+                                             WHERE InvoiceItems.InvoiceID = Invoices.InvoiceID) AS LatestItemDate
                                      FROM Invoices
                                      WHERE CustomerName LIKE $q OR Mobile LIKE $q
                                      ORDER BY InvoiceID DESC;";
