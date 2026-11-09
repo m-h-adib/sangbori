@@ -193,9 +193,10 @@ namespace SangbariInvoice.Forms
                 {
                     var balance = Convert.ToDecimal(row.Cells["SmsBalance"].Value);
                     var date = Convert.ToString(row.Cells["SmsDate"].Value) ?? "";
-                    message = "با سلام" + Environment.NewLine +
+                    message = "با سلام "+ (Convert.ToString(row.Cells["SmsName"].Value) ?? "") + Environment.NewLine +
                               "مبلغ " + balance.ToString("N0") +
-                              " تومان بدهی شما به سنگ المهدی تا تاریخ " + date;
+                              " تومان بدهی شما به سنگ المهدی تا تاریخ " + date+Environment.NewLine+
+                              "شماره تماس 09136016314";
                 }
                 else
                 {
